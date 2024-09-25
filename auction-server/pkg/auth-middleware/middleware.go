@@ -3,13 +3,14 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 // Define your JWT secret key (should be kept secure and not hardcoded)
-var JwtSecret = []byte("y7Q4l3F9kN8sO2aB1v6R5jX9tV7gD3wE")
+var JwtSecret = []byte(os.Getenv("JwtSecret"))
 
 // Claims struct that will be encoded in the JWT token
 type Claims struct {

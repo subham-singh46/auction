@@ -9,10 +9,8 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-	middleware "github.com/hemantsharma1498/auction/pkg/auth-middleware"
+	"github.com/hemantsharma1498/auction/pkg/auth"
 	"github.com/hemantsharma1498/auction/store/models"
 	"golang.org/x/crypto/argon2"
 )
@@ -54,6 +52,18 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 		writeResponse(w, errors.New("entered pasword and stored password don't match"), "entered pasword and stored password don't match", http.StatusBadRequest)
 		return
 	}
+
+	token, err := auth.GenerateJWT(users[0].UserID, d.Email)
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	// Return the token in the response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"token": token,
+	})
 }
 
 func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -127,25 +137,4 @@ func writeResponse(w http.ResponseWriter, err error, msg any, httpStatus int) er
 	}
 	w.WriteHeader(httpStatus)
 	return json.NewEncoder(w).Encode(msg)
-}
-
-func GenerateJWT(userID int, email string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
-
-	claims := &middleware.Claims{
-		UserID: userID,
-		Email:  email,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(middleware.JwtSecret)
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
 }

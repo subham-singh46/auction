@@ -2,11 +2,13 @@ package postgresDb
 
 import (
 	"database/sql"
+	"os"
+
 	"github.com/hemantsharma1498/auction/store"
 	_ "github.com/lib/pq"
 )
 
-const dsn = "user=auction_user dbname=auction_db sslmode=disable"
+var dsn = os.Getenv("Dsn")
 
 func NewAuctionDbConnector() store.Connecter {
 	return &PostgresDb{}
