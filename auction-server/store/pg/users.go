@@ -40,3 +40,19 @@ func (pg *PostgresDb) GetUsersByEmail(emails []string) ([]*models.User, error) {
 
 	return users, nil
 }
+
+func (pg *PostgresDb) UpdatePassword(email, salt, pwHash string) error {
+	res, err := pg.db.Exec("UPDATE users SET salt = $1, pw_hash = $2 WHERE email = $3", salt, pwHash, email)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return err
+	}
+	return nil
+}

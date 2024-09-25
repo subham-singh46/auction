@@ -11,3 +11,8 @@ type SignUpReq struct {
 	Mobile   string `json:"mobile"`
 	Password string `json:"password"`
 }
+
+type UpdatePasswordReq struct {
+	Email       string `json:"email"`
+	NewPassword string `json:"newPassword"`
+}

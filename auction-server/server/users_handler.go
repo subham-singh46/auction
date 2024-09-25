@@ -22,12 +22,6 @@ const (
 	keyLen   uint32 = 32
 )
 
-func valid(email string) bool {
-	_, err := mail.ParseAddress(email)
-	fmt.Println(err, email)
-	return err == nil
-}
-
 func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 	d := &LoginReq{}
 	if err := decodeReqBody(r, d); err != nil {
@@ -102,6 +96,28 @@ func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, nil, "account created successfully", http.StatusOK)
 }
 
+func (s *Server) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	d := &UpdatePasswordReq{}
+	if !valid(d.Email) {
+		writeResponse(w, errors.New("invalid email"), "invalid email", http.StatusBadRequest)
+		return
+	}
+	if err := decodeReqBody(r, d); err != nil {
+		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+		return
+	}
+
+	salt, err := generateSalt()
+	if err != nil {
+		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+		return
+	}
+	pwHash := createHash(d.NewPassword, salt)
+
+	s.store.UpdatePassword(d.Email, EncodeBase64(salt), EncodeBase64(pwHash))
+
+}
+
 func EncodeBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
@@ -129,6 +145,12 @@ func decodeReqBody(r *http.Request, d any) error {
 		return err
 	}
 	return nil
+}
+
+func valid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	fmt.Println(err, email)
+	return err == nil
 }
 
 func writeResponse(w http.ResponseWriter, err error, msg any, httpStatus int) error {
