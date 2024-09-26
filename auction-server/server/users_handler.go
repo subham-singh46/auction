@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -23,7 +22,7 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 	users, err := s.store.GetUsersByEmail([]string{d.Email})
 
 	if err != nil {
-		utils.WriteResponse(w, nil, err.Error(), http.StatusBadRequest)
+		utils.WriteResponse(w, err, nil, http.StatusBadRequest)
 		return
 	}
 
@@ -41,11 +40,9 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return the token in the response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": token,
-	})
+	res := &LoginRes{UserID: users[0].UserID, Token: token}
+	utils.WriteResponse(w, nil, res, http.StatusOK)
+
 }
 
 func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -58,9 +55,15 @@ func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 		utils.WriteResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
 		return
 	}
-	_, err := s.store.GetUsersByEmail([]string{d.Email})
+	users, err := s.store.GetUsersByEmail([]string{d.Email})
 	if err != nil && err.Error() != "no users found for the provided emails" {
 		utils.WriteResponse(w, nil, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res := &SignUpRes{}
+	if len(users) > 0 {
+		res.Msg = "User exists for the give email"
+		utils.WriteResponse(w, nil, res, http.StatusBadRequest)
 		return
 	}
 
@@ -77,24 +80,33 @@ func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 		Salt:   utils.EncodeBase64(salt),
 		PwHash: utils.EncodeBase64(pwHash),
 	}
-	if err = s.store.CreateUser(user); err != nil {
+	userId, err := s.store.CreateUser(user)
+	res.UserID = userId
+	if err != nil {
 		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	utils.WriteResponse(w, nil, "account created successfully", http.StatusOK)
+
+	token, err := auth.GenerateJWT(userId, d.Email)
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+	res.Token = token
+	utils.WriteResponse(w, nil, res, http.StatusOK)
 }
 
 func (s *Server) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	d := &UpdatePasswordReq{}
-	if !utils.ValidEmail(d.Email) {
-		utils.WriteResponse(w, errors.New("invalid email"), "invalid email", http.StatusBadRequest)
-		return
-	}
 	if err := utils.DecodeReqBody(r, d); err != nil {
 		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
 
+	if !utils.ValidEmail(d.Email) {
+		utils.WriteResponse(w, errors.New("invalid email"), "invalid email", http.StatusBadRequest)
+		return
+	}
 	salt, err := utils.GenerateSalt()
 	if err != nil {
 		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)

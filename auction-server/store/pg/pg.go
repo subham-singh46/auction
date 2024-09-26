@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var dsn = os.Getenv("Dsn")
+var dsn = os.Getenv("DATABASE_URL")
 
 func NewAuctionDbConnector() store.Connecter {
 	return &PostgresDb{}
@@ -43,7 +43,8 @@ func initDb() (*sql.DB, error) {
 
 	// @TODO Refactor to migration script
 	db.Exec("CREATE TABLE IF NOT EXISTS users (user_id SERIAL PRIMARY KEY, name TEXT NOT NULL, salt TEXT NOT NULL, pw_hash TEXT NOT NULL, email TEXT NOT NULL UNIQUE, mobile TEXT NOT NULL UNIQUE, created_at TIMESTAMPTZ DEFAULT NOW());")
-	db.Exec("CREATE TABLE tickets (id SERIAL PRIMARY KEY, user_id INT NOT NULL, event_date DATE NOT NULL, number_of_tickets INT NOT NULL, seat_info JSONB, price NUMERIC(10, 2) NOT NULL, auction_end TIMESTAMPTZ NOT NULL, best_offer NUMERIC(10, 2), created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPZ);")
+	db.Exec("CREATE TABLE IF NOT EXISTS tickets (id SERIAL PRIMARY KEY, user_id INT NOT NULL, event_date DATE NOT NULL, number_of_tickets INT NOT NULL, seat_info JSONB, price NUMERIC(10, 2) NOT NULL, auction_end TIMESTAMPTZ NOT NULL, best_offer NUMERIC(10, 2), created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPZ);")
+	db.Exec("CREATE TABLE IF NOT EXISTS tickets (id SERIAL PRIMARY KEY, user_id INT NOT NULL, event_date DATE NOT NULL, number_of_tickets INT NOT NULL, seat_info JSONB, price NUMERIC(10, 2) NOT NULL, auction_end TIMESTAMPTZ NOT NULL, best_offer NUMERIC(10, 2), created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPZ);")
 
 	return db, nil
 }

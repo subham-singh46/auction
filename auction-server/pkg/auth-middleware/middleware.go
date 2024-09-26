@@ -22,6 +22,10 @@ type Claims struct {
 // JWTMiddleware is the middleware that validates the JWT token from the Authorization header
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Authorization header is missing", http.StatusUnauthorized)
@@ -49,7 +53,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Token is valid, store user info in context for further use in the next handlers
-		ctx := context.WithValue(r.Context(), "user_id", claims.UserID)
+		ctx := context.WithValue(r.Context(), "UserID", claims.UserID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

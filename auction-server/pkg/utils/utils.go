@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
+	"time"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -56,6 +57,11 @@ func WriteResponse(w http.ResponseWriter, err error, msg any, httpStatus int) er
 	if err != nil {
 		log.Println(err)
 	}
+	w.Header().Add("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(httpStatus)
 	return json.NewEncoder(w).Encode(msg)
+}
+
+func IsoDateToTime(date string) (time.Time, error) {
+	return time.Parse(time.RFC3339, date)
 }

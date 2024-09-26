@@ -7,7 +7,7 @@ import (
 	postgresDb "github.com/hemantsharma1498/auction/store/pg"
 )
 
-const httpAddress = ":3000"
+const httpAddress = ":3100"
 
 func main() {
 	log.Printf("Initialising members server")
