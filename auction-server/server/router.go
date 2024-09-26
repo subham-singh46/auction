@@ -6,6 +6,14 @@ import (
 	middleware "github.com/hemantsharma1498/auction/pkg/auth-middleware"
 )
 
+/*
+*GetUsersListing
+*GetUserBids
+*GetAllTickets
+*AddBid
+*ConfirmSale
+ */
+
 func (s *Server) Routes() {
 	s.Router.HandleFunc("/sign-up", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

@@ -1,49 +1,37 @@
 package server
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
-	"net/mail"
 
 	"github.com/hemantsharma1498/auction/pkg/auth"
+	"github.com/hemantsharma1498/auction/pkg/utils"
 	"github.com/hemantsharma1498/auction/store/models"
-	"golang.org/x/crypto/argon2"
-)
-
-const (
-	saltSize int    = 16
-	sTime    uint32 = 6
-	memory   uint32 = 32
-	keyLen   uint32 = 32
 )
 
 func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 	d := &LoginReq{}
-	if err := decodeReqBody(r, d); err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+	if err := utils.DecodeReqBody(r, d); err != nil {
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	if !valid(d.Email) {
-		writeResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
+	if !utils.ValidEmail(d.Email) {
+		utils.WriteResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
 		return
 	}
 	users, err := s.store.GetUsersByEmail([]string{d.Email})
 
 	if err != nil {
-		writeResponse(w, nil, err.Error(), http.StatusBadRequest)
+		utils.WriteResponse(w, nil, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	decodedSalt, _ := DecodeBase64(users[0].Salt)
+	decodedSalt, _ := utils.DecodeBase64(users[0].Salt)
 
-	enteredPasswordHash := createHash(d.Password, []byte(decodedSalt))
-	if EncodeBase64(enteredPasswordHash) != users[0].PwHash {
-		writeResponse(w, errors.New("entered pasword and stored password don't match"), "entered pasword and stored password don't match", http.StatusBadRequest)
+	enteredPasswordHash := utils.CreateHash(d.Password, []byte(decodedSalt))
+	if utils.EncodeBase64(enteredPasswordHash) != users[0].PwHash {
+		utils.WriteResponse(w, errors.New("entered pasword and stored password don't match"), "entered pasword and stored password don't match", http.StatusBadRequest)
 		return
 	}
 
@@ -62,101 +50,58 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 	d := &SignUpReq{}
-	if err := decodeReqBody(r, d); err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+	if err := utils.DecodeReqBody(r, d); err != nil {
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	if !valid(d.Email) {
-		writeResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
+	if !utils.ValidEmail(d.Email) {
+		utils.WriteResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
 		return
 	}
 	_, err := s.store.GetUsersByEmail([]string{d.Email})
 	if err != nil && err.Error() != "no users found for the provided emails" {
-		writeResponse(w, nil, err.Error(), http.StatusBadRequest)
+		utils.WriteResponse(w, nil, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	salt, err := generateSalt()
+	salt, err := utils.GenerateSalt()
 	if err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	pwHash := createHash(d.Password, salt)
+	pwHash := utils.CreateHash(d.Password, salt)
 	user := &models.User{
 		Name:   d.Name,
 		Email:  d.Email,
 		Mobile: d.Mobile,
-		Salt:   EncodeBase64(salt),
-		PwHash: EncodeBase64(pwHash),
+		Salt:   utils.EncodeBase64(salt),
+		PwHash: utils.EncodeBase64(pwHash),
 	}
 	if err = s.store.CreateUser(user); err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	writeResponse(w, nil, "account created successfully", http.StatusOK)
+	utils.WriteResponse(w, nil, "account created successfully", http.StatusOK)
 }
 
 func (s *Server) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	d := &UpdatePasswordReq{}
-	if !valid(d.Email) {
-		writeResponse(w, errors.New("invalid email"), "invalid email", http.StatusBadRequest)
+	if !utils.ValidEmail(d.Email) {
+		utils.WriteResponse(w, errors.New("invalid email"), "invalid email", http.StatusBadRequest)
 		return
 	}
-	if err := decodeReqBody(r, d); err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+	if err := utils.DecodeReqBody(r, d); err != nil {
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
 
-	salt, err := generateSalt()
+	salt, err := utils.GenerateSalt()
 	if err != nil {
-		writeResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
+		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-	pwHash := createHash(d.NewPassword, salt)
+	pwHash := utils.CreateHash(d.NewPassword, salt)
 
-	s.store.UpdatePassword(d.Email, EncodeBase64(salt), EncodeBase64(pwHash))
+	s.store.UpdatePassword(d.Email, utils.EncodeBase64(salt), utils.EncodeBase64(pwHash))
 
-}
-
-func EncodeBase64(data []byte) string {
-	return base64.StdEncoding.EncodeToString(data)
-}
-
-func DecodeBase64(encodedData string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(encodedData)
-}
-
-func generateSalt() ([]byte, error) {
-	salt := make([]byte, saltSize)
-	_, err := rand.Read(salt)
-	if err != nil {
-		return nil, err
-	}
-	return salt, nil
-}
-
-func createHash(password string, salt []byte) []byte {
-	hash := argon2.Key([]byte(password), salt, sTime, memory, 8, keyLen)
-	return hash
-}
-
-func decodeReqBody(r *http.Request, d any) error {
-	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		return err
-	}
-	return nil
-}
-
-func valid(email string) bool {
-	_, err := mail.ParseAddress(email)
-	fmt.Println(err, email)
-	return err == nil
-}
-
-func writeResponse(w http.ResponseWriter, err error, msg any, httpStatus int) error {
-	if err != nil {
-		log.Println(err)
-	}
-	w.WriteHeader(httpStatus)
-	return json.NewEncoder(w).Encode(msg)
 }

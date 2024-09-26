@@ -16,3 +16,16 @@ type UpdatePasswordReq struct {
 	Email       string `json:"email"`
 	NewPassword string `json:"newPassword"`
 }
+
+type AddTicketReq struct {
+	ConcertDate     string `json:"concertDate"`
+	NumberOfTickets int    `json:"numberOfTickets"`
+	Seats           []Seat `json:"details"`
+	Deadline        string `json:"deadline"`
+}
+
+type Seat struct {
+	SeatNumber int    `json:"seatNumber"`
+	Block      string `json:"block"`
+	Level      string `json:"level"`
+}
