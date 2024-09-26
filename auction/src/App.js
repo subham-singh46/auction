@@ -7,6 +7,7 @@ import ListTicket from './components/ListTicket';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import EventsSection from './components/EventsSection';
+import SignUp from './components/SignUp';
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,6 +36,7 @@ function App() {
                         <Route path="/list-ticket" element={<ListTicket />} />
                         <Route path="/events" element={<EventsSection setIsLoggedIn={setIsLoggedIn} />} />
                         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/signup" element={<SignUp setIsLoggedIn={setIsLoggedIn} />} />
                         <Route path="/profile" element={isLoggedIn ? <Profile /> : <Login setIsLoggedIn={setIsLoggedIn} />} />
                     </Routes>
                 </main>

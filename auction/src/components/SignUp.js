@@ -6,7 +6,7 @@ import './Auth.css'
 function SignUp({ setIsLoggedIn }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
+    const [mobile, setmobile] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -24,7 +24,7 @@ function SignUp({ setIsLoggedIn }) {
         const response = await fetch(`${config.API_BASE_URL}/sign-up`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, phone, password }),
+            body: JSON.stringify({ name, email, mobile, password }),
         });
 
         if (response.ok) {
@@ -56,11 +56,11 @@ function SignUp({ setIsLoggedIn }) {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <label>Phone:</label>
+                <label>Mobile:</label>
                 <input
                     type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={mobile}
+                    onChange={(e) => setmobile(e.target.value)}
                     required
                 />
                 <label>Password:</label>

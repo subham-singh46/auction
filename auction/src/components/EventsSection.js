@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import config from '../config';
+import Modal from './Modal'; // Import the Modal component
 import './EventsSection.css';
 
 function EventsSection({ isLoggedIn }) {
@@ -10,6 +11,10 @@ function EventsSection({ isLoggedIn }) {
     const [sortOption, setSortOption] = useState('deadline');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedTicket, setSelectedTicket] = useState(null); // Track the selected ticket
+    const [isModalOpen, setIsModalOpen] = useState(false); // Track modal state
+    const [bidAmount, setBidAmount] = useState(''); // Track bid input
+    const [isBidValid, setIsBidValid] = useState(false); // Track bid validation
 
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
@@ -79,6 +84,67 @@ function EventsSection({ isLoggedIn }) {
         return `${days}d ${hours}h ${minutes}m ${seconds}s`;
     };
 
+    // Handle opening the modal with selected ticket details
+    const handleViewDetails = (ticket) => {
+        setSelectedTicket(ticket); // Set the ticket that will be displayed in the modal
+        setBidAmount(''); // Clear the previous bid amount
+        setIsModalOpen(true); // Open the modal
+    };
+
+    // Handle closing the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedTicket(null); // Clear the selected ticket after closing
+    };
+
+    // Handle the bid input change and validation
+    const handleBidChange = (e) => {
+        const newBidAmount = e.target.value;
+        setBidAmount(newBidAmount);
+
+        if (newBidAmount && parseFloat(newBidAmount) > selectedTicket.highestBid) {
+            setIsBidValid(true); // Enable the Place Bid button if the bid is valid
+        } else {
+            setIsBidValid(false); // Disable the Place Bid button if the bid is invalid
+        }
+    };
+
+    // Handle placing a bid
+    const handlePlaceBid = async () => {
+        const token = localStorage.getItem('jwtToken');
+        const userId = localStorage.getItem('userId'); // Assuming you store the user ID in localStorage
+
+        if (!token || !userId || !selectedTicket) {
+            console.error('User is not authenticated or ticket is not selected.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${config.API_BASE_URL}/place-bid`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticketId: selectedTicket.id,
+                    userId: parseInt(userId),
+                    bidPrice: parseFloat(bidAmount),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to place bid. Status: ${response.status}`);
+            }
+
+            alert('Bid successfully placed!');
+            closeModal(); // Close the modal after placing the bid
+        } catch (error) {
+            console.error('Error placing bid:', error);
+            alert('Failed to place bid. Please try again.');
+        }
+    };
+
     const renderTicket = (ticket, index) => {
         const commonContent = (
             <>
@@ -87,7 +153,10 @@ function EventsSection({ isLoggedIn }) {
                 <p><strong>Price:</strong> ₹{ticket.price}</p>
                 <p><strong>Seats:</strong> {ticket.seatInfo.map(seat => `#${seat.seatNumber} (Block: ${seat.block}, Level: ${seat.level})`).join(', ')}</p>
                 <p><strong>Time Left:</strong> {calculateTimeLeft(ticket.deadline)}</p>
-                <button className="view-details-btn">View Details</button>
+                <p><strong>Highest Bid:</strong> ₹{ticket.highestBid}</p>
+                <button className="view-details-btn" onClick={() => handleViewDetails(ticket)}>
+                    View Details
+                </button>
             </>
         );
 
@@ -103,7 +172,13 @@ function EventsSection({ isLoggedIn }) {
     };
 
     const renderTickets = () => {
-        if (loading) return <p className="status-message">Loading tickets...</p>;
+        if (loading) {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                return <p className="status-message">Log in to view more</p>;
+            }
+            return <p className="status-message">Loading tickets...</p>;
+        }
         if (error) return <p className="status-message error">Error: {error}</p>;
 
         let filteredTickets = filterTickets(tickets);
@@ -158,6 +233,43 @@ function EventsSection({ isLoggedIn }) {
             <div className={`ticket-container ${view}-view`}>
                 {renderTickets()}
             </div>
+
+            {/* Modal for viewing ticket details */}
+            {isModalOpen && selectedTicket && (
+                <Modal closeModal={closeModal}>
+                    <h2>Ticket Details</h2>
+                    <p><strong>Date:</strong> {new Date(selectedTicket.eventDate).toLocaleDateString()}</p>
+                    <p><strong>Price:</strong> ₹{selectedTicket.price}</p>
+                    <p><strong>Seats:</strong> {selectedTicket.seatInfo.map(seat => `#${seat.seatNumber} (Block: ${seat.block}, Level: ${seat.level})`).join(', ')}</p>
+                    <p><strong>Highest Bid:</strong> ₹{selectedTicket.highestBid}</p>
+                    <p><strong>Time Left:</strong> {calculateTimeLeft(selectedTicket.deadline)}</p>
+                    <p><strong>Listed By:</strong> {selectedTicket.listedBy}</p>
+
+                    {/* Bid Input */}
+                    <div className="bid-section">
+                        <label htmlFor="bid-input">Place your bid:</label>
+                        <input
+                            type="number"
+                            id="bid-input"
+                            value={bidAmount}
+                            onChange={handleBidChange}
+                            min={selectedTicket.highestBid + 1} // Minimum bid should be higher than the current bid
+                        />
+                        <button
+                            className="place-bid-btn"
+                            onClick={handlePlaceBid}
+                            disabled={!isBidValid} // Disable the button if the bid is invalid
+                        >
+                            Place Bid
+                        </button>
+                    </div>
+
+                    {/* Close button in the top-right corner */}
+                    <button className="modal-close-btn" onClick={closeModal}>
+                        &times;
+                    </button>
+                </Modal>
+            )}
         </div>
     );
 }

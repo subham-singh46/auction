@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import config from '../config'; // Import your config file for the host URL
+import React, { useEffect, useState } from 'react';
+import config from '../config';
 import './Profile.css';
-import dayjs from 'dayjs';
 
 function Profile() {
-    const [activeTab, setActiveTab] = useState('listings'); // "listings" or "biddings"
-    const [tickets, setTickets] = useState([]); // Initialize tickets as an empty array
-    const [loading, setLoading] = useState(false); // Track loading state
-    const [error, setError] = useState(null); // Track any errors
+    const [activeTab, setActiveTab] = useState('listings'); // 'listings' or 'biddings'
+    const [listings, setListings] = useState([]); // Ensure it's initialized as an empty array
+    const [biddings, setBiddings] = useState([]); // Ensure it's initialized as an empty array
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (activeTab === 'listings') {
             fetchUserListings();
+        } else if (activeTab === 'biddings') {
+            fetchUserBids();
         }
     }, [activeTab]);
 
     const fetchUserListings = async () => {
-        setLoading(true); // Start loading
-        setError(null); // Reset errors
         const token = localStorage.getItem('jwtToken');
-
         if (!token) {
-            console.error('No token found');
+            setError('No token found');
+            setLoading(false);
             return;
         }
 
@@ -38,77 +38,110 @@ function Profile() {
             }
 
             const data = await response.json();
-            if (data.Tickets) {
-                setTickets(data.Tickets); // Set tickets array from the response
-            } else {
-                setTickets([]); // Ensure tickets is an empty array if data.Tickets is undefined
-            }
+            setListings(data.Tickets || []); // Default to an empty array if Tickets is undefined
         } catch (error) {
-            console.error('Error fetching listings:', error);
             setError('Failed to fetch listings.');
         } finally {
-            setLoading(false); // End loading
+            setLoading(false);
         }
     };
 
-    return (
-        <div className="profile-page">
-            <h1>Profile</h1>
+    const fetchUserBids = async () => {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            setError('No token found');
+            setLoading(false);
+            return;
+        }
 
-            <div className="tabs">
+        try {
+            const response = await fetch(`${config.API_BASE_URL}/get-user-bids`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch biddings. Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setBiddings(data.bids || []); // Default to an empty array if bids is undefined
+        } catch (error) {
+            setError('Failed to fetch biddings.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renderListings = () => {
+        if (loading) return <p>Loading...</p>;
+        if (error) return <p>{error}</p>;
+
+        if (!listings || listings.length === 0) {
+            return <p>No listings available.</p>;
+        }
+
+        return listings.map((listing) => (
+            <div key={listing.ticketId} className="listing-item">
+                <h3>{listing.eventName}</h3>
+                <p><strong>Date:</strong> {new Date(listing.eventDate).toLocaleDateString()}</p>
+                <p><strong>Price:</strong> ₹{listing.price}</p>
+                <p><strong>Seats:</strong> {listing.seatInfo.map(seat => `#${seat.seatNumber} (Block: ${seat.block}, Level: ${seat.level})`).join(', ')}</p>
+                <p><strong>Time Left:</strong> {calculateTimeLeft(listing.deadline)}</p>
+            </div>
+        ));
+    };
+
+    const renderBiddings = () => {
+        if (loading) return <p>Loading...</p>;
+        if (error) return <p>{error}</p>;
+
+        if (!biddings || biddings.length === 0) {
+            return <p>No biddings available.</p>;
+        }
+
+        return biddings.map((bid) => (
+            <div key={bid.BidId} className="bidding-item">
+                <h3>{bid.venue}</h3>
+                <p><strong>Original Price:</strong> ₹{bid.originalPrice}</p>
+                <p><strong>Your Bid:</strong> ₹{bid.bidPrice}</p>
+                <p><strong>Bid Date:</strong> {new Date(bid.createdAt).toLocaleDateString()}</p>
+            </div>
+        ));
+    };
+
+    const calculateTimeLeft = (deadline) => {
+        const difference = new Date(deadline) - new Date();
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    return (
+        <div className="profile-section">
+            <div className="profile-tabs">
                 <button
-                    className={activeTab === 'listings' ? 'active' : ''}
                     onClick={() => setActiveTab('listings')}
+                    className={activeTab === 'listings' ? 'active' : ''}
                 >
                     My Listings
                 </button>
                 <button
-                    className={activeTab === 'biddings' ? 'active' : ''}
                     onClick={() => setActiveTab('biddings')}
+                    className={activeTab === 'biddings' ? 'active' : ''}
                 >
                     My Biddings
                 </button>
             </div>
 
-            <div className="tab-content">
-                {activeTab === 'listings' && (
-                    <div className="listings-section">
-                        <h2>My Listings</h2>
-                        {loading ? (
-                            <p>Loading...</p>
-                        ) : error ? (
-                            <p className="error-message">{error}</p>
-                        ) : tickets.length === 0 ? (
-                            <p>You don't have any listings yet.</p>
-                        ) : (
-                            <ul>
-                                {tickets.map((ticket, index) => (
-                                    < li key={index} >
-                                        <p><strong>Event Date:</strong> {new Date(ticket.eventDate).toLocaleDateString()}</p>
-                                        <p><strong>Listed By:</strong> {ticket.listedBy}</p>
-                                        <p><strong>Seats:</strong></p>
-                                        <ul>
-                                            {ticket.seatInfo.map((seat, index) => (
-                                                <p key={index}>Seat {seat.seatNumber} (Block: {seat.block}, Level: {seat.level})</p>
-                                            ))}
-                                        </ul>
-                                        <p><strong>Price:</strong> ₹{ticket.price}</p>
-                                        <p><strong>Deadline:</strong> {dayjs(ticket.deadline).isValid() ? dayjs(ticket.deadline).format('DD/MM/YYYY') : new Date(ticket.eventDate).toLocaleDateString()}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'biddings' && (
-                    <div className="biddings-section">
-                        <h2>My Biddings</h2>
-                        <p>Biddings functionality will be available soon.</p>
-                    </div>
-                )}
+            <div className="profile-content">
+                {activeTab === 'listings' ? renderListings() : renderBiddings()}
             </div>
-        </div >
+        </div>
     );
 }
 
