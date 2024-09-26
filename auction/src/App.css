@@ -1,0 +1,33 @@
+/* Ensure the entire page takes the full height of the viewport */
+html, body {
+  height: 100%; /* This ensures that the html and body take the full height */
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column; /* Make the root a flex container */
+  height: 100%; /* Ensure root takes up full height */
+}
+
+.App {
+  display: flex;
+  flex-direction: column; /* Make .App a flex container with column layout */
+  flex-grow: 1; /* Allow the .App container to grow and take the available space */
+}
+
+main {
+  flex-grow: 1; /* Make the main content grow and take up the remaining space */
+}
+
+.footer {
+  background-color: #f5f5f7;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  color: #6e6e73;
+  width: 100%;
+  position: relative; /* Footer is positioned relative */
+  bottom: 0;
+}

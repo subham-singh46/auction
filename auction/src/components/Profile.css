@@ -1,0 +1,66 @@
+/* Profile Page Styling */
+.profile-page {
+  padding: 20px;
+  text-align: center;
+}
+
+.profile-page h1 {
+  font-size: 2.5rem;
+  color: #1d1d1f;
+  margin-bottom: 20px;
+}
+
+/* Tabs Styling */
+.tabs {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  background-color: #f5f5f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.tabs button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.tabs button:hover:not(.active) {
+  background-color: #e0e0e0;
+}
+
+/* Tab Content Styling */
+.tab-content {
+  padding: 20px;
+  text-align: left;
+}
+
+.listings-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.listings-section li {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listings-section li p {
+  margin: 5px 0;
+}
+
+.biddings-section p {
+  font-size: 1.25rem;
+  color: #6e6e73;
+}

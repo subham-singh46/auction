@@ -1,0 +1,51 @@
+/* Home.css */
+
+.home-page {
+  text-align: center;
+  padding: 40px;
+}
+
+.home-page h1 {
+  font-size: 2.5rem;
+  color: #1d1d1f;
+  margin-bottom: 20px;
+}
+
+.home-page p {
+  font-size: 1.25rem;
+  color: #6e6e73;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Styling for the Home Page */
+.home {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Icon Section Styling */
+.icon-section {
+  display: flex;
+  justify-content: center;
+  gap: 40px; /* Add space between the icons */
+  margin-top: 30px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #333; /* Adjust according to theme */
+}
+
+.icon-item i {
+  font-size: 1.5rem; /* Decrease the icon size */
+  margin-bottom: 5px; /* Adjust space between the icon and text */
+}
+
+.icon-item p {
+  margin: 0;
+  font-weight: bold;
+}

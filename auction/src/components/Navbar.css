@@ -1,0 +1,47 @@
+/* Navbar styling */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Align items to opposite ends */
+  align-items: center; /* Ensure items are vertically centered */
+  padding: 10px 20px;
+  background-color: #fff; /* Adjust according to your theme */
+}
+
+/* Navbar links container */
+.nav-links {
+  display: flex; /* Ensure the links are displayed in a row */
+  gap: 20px; /* Space between the links */
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Common styling for all links in the navbar */
+.nav-link {
+  text-decoration: none;
+  padding: 10px 15px;
+  color: #1d1d1f; /* Adjust to your theme color */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: inline-block;
+}
+
+.nav-link:hover {
+  color: #0056b3; /* Slightly darker blue on hover */
+}
+
+/* Style for the logout button */
+.logout-btn {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  color: #1d1d1f;  /* Same color as links */
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline-block;
+}
+
+.logout-btn:hover {
+  color: #0056b3; /* Same hover effect */
+}
