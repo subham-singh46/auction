@@ -32,7 +32,7 @@ function EventsSection({ isLoggedIn }) {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/api/get-all-tickets`, {
+            const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/get-all-tickets`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ function EventsSection({ isLoggedIn }) {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/api/place-bid`, {
+            const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/place-bid`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,

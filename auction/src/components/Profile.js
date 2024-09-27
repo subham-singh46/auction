@@ -26,7 +26,7 @@ function Profile() {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/api/get-user-listing`, {
+            const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/get-user-listing`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ function Profile() {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/api/get-user-bids`, {
+            const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/get-user-bids`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
