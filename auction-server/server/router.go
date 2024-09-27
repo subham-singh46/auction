@@ -7,10 +7,6 @@ import (
 )
 
 /*
-*GetUsersListing
-*GetUserBids
-*GetAllTickets
-*AddBid
 *ConfirmSale
  */
 
@@ -53,13 +49,26 @@ func (s *Server) Routes() {
 		}
 		s.GetAllTickets(w, r)
 	})))
-
 	s.Router.Handle("/get-user-listing", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.GetUserListing(w, r)
+	})))
+	s.Router.Handle("/place-bid", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		s.AddNewBid(w, r)
+	})))
+	s.Router.Handle("/get-user-bids", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		s.GetUserBids(w, r)
 	})))
 }
 

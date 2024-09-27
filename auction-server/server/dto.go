@@ -18,7 +18,9 @@ type SignUpReq struct {
 }
 
 type SignUpRes struct {
-	UserID int `json:"userId"`
+	Msg    string `json:"msg"`
+	Token  string `json:"token"`
+	UserID int    `json:"userId"`
 }
 
 type UpdatePasswordReq struct {
@@ -55,11 +57,37 @@ type GetAllTicketsRes struct {
 }
 
 type Ticket struct {
+	TicketID        int    `json:"ticketId"`
 	EventDate       string `json:"eventDate"`
+	UserID          int    `json:"userId"`
 	Venue           string `json:"Venue"`
 	NumberOfTickets int    `json:"numberOfTickets"`
 	Price           int    `json:"price"`
+	HighestBid      int    `json:"highestBid"`
 	SeatInfo        []Seat `json:"seatInfo"`
 	Deadline        string `json:"deadline"`
 	ListedBy        string `json:"listedBy"`
+}
+
+type AddNewBidReq struct {
+	TicketID int `json:"ticketId"`
+	OwnerID  int `json:"userId"`
+	BidPrice int `json:"bidPrice"`
+}
+type AddNewBidRes struct {
+	BidID int `json:"bidId"`
+}
+
+type GetUserBidsRes struct {
+	Bids []UserBid `json:"bids"`
+}
+type UserBid struct {
+	BidId         int    `json:"BidId"`
+	TicketId      int    `json:"ticketId"`
+	BidPrice      int    `json:"bidPrice"`
+	OriginalPrice int    `json:"originalPrice"`
+	Venue         string `json:"venue"`
+	OwnerId       int    `json:"ownerId"`
+	BidderId      int    `json:"bidderId"`
+	CreatedAt     string `json:"createdAt"`
 }
