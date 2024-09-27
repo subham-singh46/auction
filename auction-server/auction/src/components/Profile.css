@@ -1,0 +1,55 @@
+/* Profile Tabs */
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-tabs button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.profile-tabs button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.profile-tabs button:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+/* Profile Content */
+.profile-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.listing-item,
+.bidding-item {
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listing-item h3,
+.bidding-item h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.listing-item p,
+.bidding-item p {
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: #555;
+}

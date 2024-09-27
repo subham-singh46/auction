@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/hemantsharma1498/auction/pkg/utils"
@@ -66,52 +67,7 @@ func (s *Server) GetAllTickets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tickets, err := s.store.GetAllTickets(d.Limit, d.Offset)
-	if err != nil {
-		utils.WriteResponse(w, err, "Error occurred. Please try again later", http.StatusInternalServerError)
-		return
-	}
-
-	res := &GetAllTicketsRes{}
-
-	for _, t := range tickets {
-		users, err := s.store.GetUsersByIds([]int{t.UserID})
-		if err != nil {
-			utils.WriteResponse(w, err, "Error occurred. Please try again later", http.StatusInternalServerError)
-			return
-		}
-		seats := make([]Seat, 0)
-		for _, s := range t.SeatInfo {
-			seatInfo := Seat{
-				SeatNumber: s.SeatNumber,
-				Block:      s.Block,
-				Level:      s.Level,
-			}
-			seats = append(seats, seatInfo)
-		}
-
-		ticket := &Ticket{
-			TicketID:        t.TicketID,
-			EventDate:       t.EventDate.String(),
-			UserID:          t.UserID,
-			Venue:           t.Venue,
-			NumberOfTickets: t.NumberOfTickets,
-			HighestBid:      int(t.BestOffer),
-			Price:           int(t.Price),
-			SeatInfo:        seats,
-			Deadline:        t.Deadline.String(),
-			ListedBy:        users[0].Name,
-		}
-		res.Tickets = append(res.Tickets, ticket)
-	}
-
-	utils.WriteResponse(w, nil, res, http.StatusOK)
-	return
-
-}
-
-func (s *Server) GetUserListing(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("UserID").(int)
-	tickets, err := s.store.GetTicketsByUserId(userId)
+	fmt.Println(tickets)
 	if err != nil {
 		utils.WriteResponse(w, err, "Error occurred. Please try again later", http.StatusInternalServerError)
 		return
@@ -131,12 +87,48 @@ func (s *Server) GetUserListing(w http.ResponseWriter, r *http.Request) {
 			seats = append(seats, seatInfo)
 		}
 		ticket := &Ticket{
-			TicketID:        t.TicketID,
 			EventDate:       t.EventDate.String(),
 			Venue:           t.Venue,
-			UserID:          t.UserID,
 			NumberOfTickets: t.NumberOfTickets,
-			HighestBid:      int(t.BestOffer),
+			Price:           int(t.Price),
+			SeatInfo:        seats,
+			Deadline:        t.Deadline.String(),
+			ListedBy:        users[0].Name,
+		}
+		res.Tickets = append(res.Tickets, ticket)
+	}
+
+	utils.WriteResponse(w, nil, res, http.StatusOK)
+	return
+
+}
+
+func (s *Server) GetUserListing(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value("UserID").(int)
+	tickets, err := s.store.GetTicketsByUserId(userId)
+	fmt.Println(tickets)
+	if err != nil {
+		utils.WriteResponse(w, err, "Error occurred. Please try again later", http.StatusInternalServerError)
+		return
+	}
+
+	res := &GetAllTicketsRes{}
+
+	for _, t := range tickets {
+		users, _ := s.store.GetUsersByIds([]int{t.UserID})
+		seats := make([]Seat, 0)
+		for _, s := range t.SeatInfo {
+			seatInfo := Seat{
+				SeatNumber: s.SeatNumber,
+				Block:      s.Block,
+				Level:      s.Level,
+			}
+			seats = append(seats, seatInfo)
+		}
+		ticket := &Ticket{
+			EventDate:       t.EventDate.String(),
+			Venue:           t.Venue,
+			NumberOfTickets: t.NumberOfTickets,
 			Price:           int(t.Price),
 			SeatInfo:        seats,
 			Deadline:        t.Deadline.String(),

@@ -55,15 +55,9 @@ func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 		utils.WriteResponse(w, nil, errors.New("invalid email"), http.StatusBadRequest)
 		return
 	}
-	users, err := s.store.GetUsersByEmail([]string{d.Email})
+	_, err := s.store.GetUsersByEmail([]string{d.Email})
 	if err != nil && err.Error() != "no users found for the provided emails" {
 		utils.WriteResponse(w, nil, err.Error(), http.StatusBadRequest)
-		return
-	}
-	res := &SignUpRes{}
-	if len(users) > 0 {
-		res.Msg = "User exists for the give email"
-		utils.WriteResponse(w, nil, res, http.StatusBadRequest)
 		return
 	}
 
@@ -81,18 +75,11 @@ func (s *Server) SignUp(w http.ResponseWriter, r *http.Request) {
 		PwHash: utils.EncodeBase64(pwHash),
 	}
 	userId, err := s.store.CreateUser(user)
-	res.UserID = userId
 	if err != nil {
 		utils.WriteResponse(w, err, "Encountered an error. Please try again", http.StatusInternalServerError)
 		return
 	}
-
-	token, err := auth.GenerateJWT(userId, d.Email)
-	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
-		return
-	}
-	res.Token = token
+	res := &SignUpRes{UserID: userId}
 	utils.WriteResponse(w, nil, res, http.StatusOK)
 }
 

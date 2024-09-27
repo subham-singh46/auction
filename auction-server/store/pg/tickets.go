@@ -27,7 +27,7 @@ func (pg *PostgresDb) GetAllTickets(limit, offset int) ([]*models.Ticket, error)
 	res := make([]*models.Ticket, 0)
 	query :=
 		`SELECT 
-            id, venue, user_id, event_date, number_of_tickets, seat_info, price, best_offer, deadline
+            id, user_id, event_date, number_of_tickets, seat_info, price, best_offer, deadline
         FROM tickets
         LIMIT $1 OFFSET $2`
 
@@ -42,7 +42,6 @@ func (pg *PostgresDb) GetAllTickets(limit, offset int) ([]*models.Ticket, error)
 		seatInfoJson := make([]byte, 0)
 		err := rows.Scan(
 			&ticket.TicketID,
-			&ticket.Venue,
 			&ticket.UserID,
 			&ticket.EventDate,
 			&ticket.NumberOfTickets,

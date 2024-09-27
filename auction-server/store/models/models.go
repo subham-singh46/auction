@@ -34,15 +34,3 @@ type SeatInfo struct {
 	Block      string `json:"block"`
 	Level      int    `json:"level"`
 }
-
-type Bid struct {
-	BidId         int       `json:"BidId"`
-	TicketId      int       `json:"ticketId"`
-	BidPrice      int       `json:"bidPrice"`
-	OriginalPrice int       `json:"originalPrice"`
-	Venue         string    `json:"venue"`
-	OwnerId       int       `json:"ownerId"`
-	BidderId      int       `json:"bidderId"`
-	CreatedAt     time.Time `json:"createdAt" db:"created_at"` // Record creation timestamp
-	UpdatedAt     time.Time `json:"updatedAt" db:"updated_at"`
-}

@@ -11,8 +11,11 @@ import (
 func (pg *PostgresDb) CreateUser(user *models.User) (int, error) {
 	var userId int
 	query :=
-		`INSERT INTO users(name, email, salt, pw_hash, mobile) VALUES($1, $2, $3, $4, $5) RETURNING user_id`
-	_ = pg.db.QueryRow(query, user.Name, user.Email, user.Salt, user.PwHash, user.Mobile).Scan(&userId)
+		`INSERT INTO users(name, email, salt, pw_hash, mobile) VALUES($1, $2, $3, $4, $5)`
+	err := pg.db.QueryRow(query, user.Name, user.Email, user.Salt, user.PwHash, user.Mobile).Scan(&userId)
+	if err != nil {
+		return -1, err
+	}
 	return userId, nil
 }
 
@@ -27,7 +30,9 @@ func (pg *PostgresDb) GetUsersByIds(userIds []int) ([]*models.User, error) {
 	for rows.Next() {
 		foundRows = true
 		user := &models.User{}
-		rows.Scan(&user.UserID, &user.Name, &user.Email, &user.Salt, &user.PwHash, &user.Mobile)
+		if err := rows.Scan(&user.UserID, &user.Name, &user.Email, &user.Salt, &user.PwHash, &user.Mobile); err != nil {
+			return nil, err
+		}
 		users = append(users, user)
 	}
 	if err := rows.Err(); err != nil {
@@ -37,6 +42,7 @@ func (pg *PostgresDb) GetUsersByIds(userIds []int) ([]*models.User, error) {
 	if !foundRows {
 		return nil, errors.New("no users found for the provided ids")
 	}
+
 	return users, nil
 }
 
