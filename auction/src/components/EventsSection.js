@@ -55,6 +55,7 @@ function EventsSection({ isLoggedIn }) {
     };
 
     const filterTickets = (tickets) => {
+        if (!tickets) return []
         return tickets.filter(ticket => {
             const matchesBlock = blockFilter ? ticket.seatInfo.some(seat => seat.block === blockFilter) : true;
             const matchesLevel = levelFilter ? ticket.seatInfo.some(seat => seat.level === parseInt(levelFilter)) : true;
