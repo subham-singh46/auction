@@ -13,7 +13,7 @@ function Login({ setIsLoggedIn }) {
         e.preventDefault();
         setError('');
 
-        const response = await fetch(`${config.API_BASE_URL}/login`, {
+        const response = await fetch(`${config.API_BASE_URL}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),

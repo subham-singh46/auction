@@ -72,7 +72,7 @@ function ListTicket() {
         try {
 
             const token = localStorage.getItem('jwtToken');
-            const response = await fetch(`${config.API_BASE_URL}/add-ticket`, {
+            const response = await fetch(`${config.API_BASE_URL}/api/add-ticket`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

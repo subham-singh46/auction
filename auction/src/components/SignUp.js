@@ -21,7 +21,7 @@ function SignUp({ setIsLoggedIn }) {
             return;
         }
 
-        const response = await fetch(`${config.API_BASE_URL}/sign-up`, {
+        const response = await fetch(`${config.API_BASE_URL}/api/sign-up`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, mobile, password }),
