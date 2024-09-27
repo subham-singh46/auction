@@ -10,9 +10,11 @@ import (
 
 func (pg *PostgresDb) CreateUser(user *models.User) (int, error) {
 	var userId int
-	query :=
-		`INSERT INTO users(name, email, salt, pw_hash, mobile) VALUES($1, $2, $3, $4, $5) RETURNING user_id`
-	_ = pg.db.QueryRow(query, user.Name, user.Email, user.Salt, user.PwHash, user.Mobile).Scan(&userId)
+	query := `INSERT INTO users(name, email, salt, pw_hash, mobile) VALUES($1, $2, $3, $4, $5) RETURNING user_id`
+	err := pg.db.QueryRow(query, user.Name, user.Email, user.Salt, user.PwHash, user.Mobile).Scan(&userId)
+	if err != nil {
+		return -1, fmt.Errorf("failed to create user: %w", err)
+	}
 	return userId, nil
 }
 
