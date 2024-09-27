@@ -27,7 +27,7 @@ func (m *Server) Start(httpAddr string) error {
 		port = httpAddr
 	}
 	fmt.Println("http port", port)
-	if err := http.ListenAndServe(httpAddr, m.Router); err != nil {
+	if err := http.ListenAndServe(port, m.Router); err != nil {
 		return err
 	}
 	return nil

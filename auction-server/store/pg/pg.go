@@ -3,7 +3,6 @@ package postgresDb
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/hemantsharma1498/auction/store"
@@ -39,7 +38,6 @@ func initDb() (*sql.DB, error) {
 	dbPassword := os.Getenv("RDS_PASSWORD")
 	dbName := os.Getenv("RDS_NAME")
 
-	log.Printf("Attempting to connect to: host=%s port=%s user=%s dbname=%s", dbHost, dbPort, dbUser, dbName)
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 	db, err := sql.Open("postgres", connStr)

@@ -11,95 +11,101 @@ import (
  */
 
 func (s *Server) Routes() {
-	s.Router.HandleFunc("/sign-up", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(w, r)
+	s.Router.HandleFunc("api/sign-up", withCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}
 		s.SignUp(w, r)
-	})
-	s.Router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		enableCors(w, r)
+	})))
+	s.Router.HandleFunc("api/login", withCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}
 		s.Login(w, r)
-	})
-	s.Router.Handle("/update-password", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		enableCors(w, r)
+	})))
+	s.Router.Handle("api/update-password", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method != http.MethodPut {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.UpdatePassword(w, r)
-	})))
-	s.Router.Handle("/add-ticket", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		enableCors(w, r)
+	}))))
+	s.Router.Handle("api/add-ticket", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.AddTicket(w, r)
-	})))
-	s.Router.Handle("/get-all-tickets", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		enableCors(w, r)
+	}))))
+	s.Router.Handle("api/get-all-tickets", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.GetAllTickets(w, r)
-	})))
-	s.Router.Handle("/get-user-listing", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	}))))
+	s.Router.Handle("api/get-user-listing", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.GetUserListing(w, r)
-	})))
-	s.Router.Handle("/place-bid", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	}))))
+	s.Router.Handle("api/place-bid", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.AddNewBid(w, r)
-	})))
-	s.Router.Handle("/get-user-bids", middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	}))))
+	s.Router.Handle("api/get-user-bids", withCORS(middleware.JWTMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		s.GetUserBids(w, r)
-	})))
+	}))))
 }
 
-func enableCors(w http.ResponseWriter, r *http.Request) {
-	// Set the CORS headers
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
+func withCORS(handler http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the origin from the request
+		origin := r.Header.Get("Origin")
 
-	// If the method is OPTIONS, respond with 200 OK and return
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-}
+		// List of allowed origins
+		allowedOrigins := []string{
+			"https://main.d3to1cludkqj3l.amplifyapp.com",
+			"http://localhost:3000",
+		}
 
-func CORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set the CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true") // Optional, if you allow credentials like cookies or authorization headers
+		// Check if the request origin is in the list of allowed origins
+		allowedOrigin := ""
+		for _, allowed := range allowedOrigins {
+			if origin == allowed {
+				allowedOrigin = origin
+				break
+			}
+		}
 
-		// If the method is OPTIONS, respond with 200 OK and return
+		// If the origin is allowed, set the CORS headers
+		if allowedOrigin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Handle preflight requests
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		// Proceed to the next middleware or handler
-		next.ServeHTTP(w, r)
-	})
+		// Call the original handler
+		handler.ServeHTTP(w, r)
+	}
 }
