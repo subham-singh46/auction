@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/hemantsharma1498/auction/store"
 )
@@ -20,9 +21,12 @@ func InitServer(store store.Storage) *Server {
 
 func (m *Server) Start(httpAddr string) error {
 	log.Printf("Starting auction server at address: %s\n", httpAddr)
+	port := ":" + os.Getenv("PORT")
+	if port == ":" {
+		port = httpAddr
+	}
 	if err := http.ListenAndServe(httpAddr, m.Router); err != nil {
 		return err
 	}
 	return nil
 }
-
