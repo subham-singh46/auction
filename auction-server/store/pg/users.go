@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hemantsharma1498/auction/store/models"
 	"github.com/lib/pq"
+	"github.com/subham-singh46/auction/store/models"
 )
 
 func (pg *PostgresDb) CreateUser(user *models.User) (int, error) {

@@ -1,6 +1,6 @@
 package store
 
-import "github.com/hemantsharma1498/auction/store/models"
+import "github.com/subham-singh46/auction/store/models"
 
 type Storage interface {
 	CreateUser(*models.User) (int, error)

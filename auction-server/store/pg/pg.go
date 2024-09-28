@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hemantsharma1498/auction/store"
 	_ "github.com/lib/pq"
+	"github.com/subham-singh46/auction/store"
 )
 
 var dsn = os.Getenv("DATABASE_URL")

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	middleware "github.com/hemantsharma1498/auction/pkg/auth-middleware"
+	middleware "github.com/subham-singh46/auction/pkg/auth-middleware"
 )
 
 // GenerateJWT generates a new JWT token for the authenticated user

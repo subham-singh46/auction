@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hemantsharma1498/auction/store/models"
+	"github.com/subham-singh46/auction/store/models"
 )
 
 func (pg *PostgresDb) AddTicket(ticket *models.Ticket) (int, error) {

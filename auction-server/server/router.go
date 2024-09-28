@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	middleware "github.com/hemantsharma1498/auction/pkg/auth-middleware"
+	middleware "github.com/subham-singh46/auction/pkg/auth-middleware"
 )
 
 /*

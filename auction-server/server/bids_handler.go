@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/hemantsharma1498/auction/pkg/utils"
+	"github.com/subham-singh46/auction/pkg/utils"
 )
 
 func (s *Server) AddNewBid(w http.ResponseWriter, r *http.Request) {

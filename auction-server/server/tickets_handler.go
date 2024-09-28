@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/hemantsharma1498/auction/pkg/utils"
-	"github.com/hemantsharma1498/auction/store/models"
+	"github.com/subham-singh46/auction/pkg/utils"
+	"github.com/subham-singh46/auction/store/models"
 )
 
 func (s *Server) AddTicket(w http.ResponseWriter, r *http.Request) {

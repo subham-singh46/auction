@@ -1,4 +1,4 @@
-module github.com/hemantsharma1498/auction
+module github.com/subham-singh46/auction
 
 go 1.22.6
 

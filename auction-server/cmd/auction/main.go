@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/hemantsharma1498/auction/server"
-	postgresDb "github.com/hemantsharma1498/auction/store/pg"
+	"github.com/subham-singh46/auction/server"
+	postgresDb "github.com/subham-singh46/auction/store/pg"
 )
 
 const httpAddress = ":3100"

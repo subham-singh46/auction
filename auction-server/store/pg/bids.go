@@ -3,7 +3,7 @@ package postgresDb
 import (
 	"fmt"
 
-	"github.com/hemantsharma1498/auction/store/models"
+	"github.com/subham-singh46/auction/store/models"
 )
 
 func (pg *PostgresDb) AddNewBid(bidPrice, ownerId, ticketId, bidderId int) (int, error) {

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/hemantsharma1498/auction/pkg/auth"
-	"github.com/hemantsharma1498/auction/pkg/utils"
-	"github.com/hemantsharma1498/auction/store/models"
+	"github.com/subham-singh46/auction/pkg/auth"
+	"github.com/subham-singh46/auction/pkg/utils"
+	"github.com/subham-singh46/auction/store/models"
 )
 
 func (s *Server) Login(w http.ResponseWriter, r *http.Request) {

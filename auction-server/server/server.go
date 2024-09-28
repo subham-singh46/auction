@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/hemantsharma1498/auction/store"
+	"github.com/subham-singh46/auction/store"
 )
 
 type Server struct {
