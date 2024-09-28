@@ -22,7 +22,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com",
+  "proxy": "https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com",
   "eslintConfig": {
     "extends": [
       "react-app",
