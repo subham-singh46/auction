@@ -72,7 +72,7 @@ function ListTicket() {
         try {
 
             const token = localStorage.getItem('jwtToken');
-            const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/add-ticket`, {
+            const response = await fetch(`http://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/add-ticket`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ function Login({ setIsLoggedIn }) {
         e.preventDefault();
         setError('');
 
-        const response = await fetch(`https://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/login`, {
+        const response = await fetch(`http://Auction-postship-env.eba-pzad7jme.us-east-1.elasticbeanstalk.com/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
