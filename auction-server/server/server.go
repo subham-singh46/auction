@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -25,7 +26,8 @@ func (m *Server) Start(httpAddr string) error {
 	if port == ":" {
 		port = httpAddr
 	}
-	if err := http.ListenAndServe(httpAddr, m.Router); err != nil {
+	fmt.Println("http port", port)
+	if err := http.ListenAndServe(port, m.Router); err != nil {
 		return err
 	}
 	return nil

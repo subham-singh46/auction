@@ -19,7 +19,7 @@ function App() {
             setIsLoggedIn(true);
         }
     }, []);
-
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const handleLogout = () => {
         localStorage.removeItem('jwtToken'); // Remove token on logout
         localStorage.removeItem('userId'); // Remove user ID as well
