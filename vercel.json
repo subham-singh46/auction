@@ -5,10 +5,10 @@
       "use": "@vercel/go"
     },
     {
-      "src": "auction/public/**/*",
+      "src": "auction/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "build"
+        "distDir": "auction/build"
       }
     }
   ],
@@ -19,7 +19,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/auction/public/$1"
+      "dest": "auction/build/$1"
     }
   ]
 }
