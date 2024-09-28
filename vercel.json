@@ -1,26 +1,25 @@
 {
-    "builds": [
-      {
-        "src": "auction-server/cmd/auction/main.go",
-        "use": "@vercel/go"
-      },
-      {
-        "src": "public/**/*",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "build"
-        }
+  "builds": [
+    {
+      "src": "api/main.go",
+      "use": "@vercel/go"
+    },
+    {
+      "src": "auction/public/**/*",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
       }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "auction-server/cmd/auction/main.go"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/public/$1"
-      }
-    ]
-  }
-  
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/main.go"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/auction/public/$1"
+    }
+  ]
+}
