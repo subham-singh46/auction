@@ -1,0 +1,14 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force LF line endings for specific files (e.g., .sh, .js, etc.)
+*.js text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Force binary files to be treated as binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
